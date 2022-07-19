@@ -12,7 +12,7 @@
     "lint": "eslint --ext .ts,.tsx .",
     "prettify": "pretty-quick --staged",
     "prettify:all": "prettier --write .",
-    "prepare": "husky install"
+    "prepare": "cd .. && husky install App/.husky"
   },
   "keywords": [],
   "author": {
