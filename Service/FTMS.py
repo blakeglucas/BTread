@@ -71,9 +71,9 @@ class FTMSTreadmillData:
     # power_output = None
 
     def __init__(self, val):
-        self.instantaneous_speed = int.from_bytes(bytearray((val[1] & 0b0011, val[2])), 'big')
-        self.total_distance = int.from_bytes(val[3:5], 'big')
-        self.total_energy = int.from_bytes(val[5:8], 'big')
+        self.instantaneous_speed = int.from_bytes(val[2:4], 'little') / 100.0
+        self.total_distance = int.from_bytes(val[4:6], 'little')
+        self.total_energy = int.from_bytes(val[6:8], 'big')
         self.elapsed_time = int.from_bytes(filter(lambda x: x != 0, val[8:]), 'little')
 
     def __repr__(self):

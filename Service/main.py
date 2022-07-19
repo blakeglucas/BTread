@@ -53,7 +53,7 @@ def _on_btread_treadmill_data(new_data: FTMSTreadmillData, old_data: FTMSTreadmi
     global _active_session_id
     if _active_session_id > 0:
         d = dbmanager.new_datum(new_data.instantaneous_speed, new_data.elapsed_time, new_data.total_energy, new_data.total_distance, _active_session_id)
-        print(d)
+    # print(new_data)
 
 @sio.event
 async def connect(sid: str, env: dict):
@@ -125,7 +125,6 @@ async def main():
     await deinit_btread(-1)
 
 if __name__ == '__main__':
-    # web.run_app(app, host='localhost', port=8826)
     try:
         asyncio.run(main())
     except KeyboardInterrupt:

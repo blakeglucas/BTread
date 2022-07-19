@@ -1,0 +1,1 @@
+pyinstaller -F --paths=venv\Lib\site-packages $args[0] --hidden-import engineio.async_drivers.aiohttp --hidden-import engineio.async_aiohttp
