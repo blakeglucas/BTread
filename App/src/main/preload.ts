@@ -2,6 +2,7 @@
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 import { ipcRenderer, contextBridge } from 'electron';
 import { Titlebar, Color } from 'custom-electron-titlebar';
+import path from 'path';
 
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
@@ -10,9 +11,12 @@ contextBridge.exposeInMainWorld('electron', {
   },
 });
 
+console.log(path.join(__dirname, 'assets/icon.png'));
+
 window.addEventListener('DOMContentLoaded', () => {
   // Title bar implemenation
   new Titlebar({
     backgroundColor: Color.fromHex('#2f2f2f'),
+    icon: null,
   });
 });

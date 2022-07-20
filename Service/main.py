@@ -1,8 +1,3 @@
-from dotenv import load_dotenv
-
-from db.tables.Datum import DatumTableSchema
-load_dotenv()
-
 from aiohttp import web
 import asyncio
 from bleak import BleakScanner
@@ -10,6 +5,7 @@ from bleak.backends.device import BLEDevice
 from bleak.backends.scanner import AdvertisementData
 from BTreadDevice import BTreadDevice, BTreadDeviceEvents
 from db import manager as dbmanager
+from db.tables.Datum import DatumTableSchema
 from FTMS import FTMSMachineStatusEvent, FTMSMachineStatusEventOptions, FTMSTrainingStatus, FTMSTreadmillData
 import socketio
 from types import NoneType
@@ -133,7 +129,6 @@ async def init_btread(sid: str, args):
 
 @sio.on('ble:disconnect')
 async def deinit_btread(sid: str, *args):
-    print(args)
     global _device
     if _device:
         result = await _device.disconnect()

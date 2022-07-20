@@ -4,6 +4,8 @@ import {
   attachTitlebarToWindow,
   // @ts-ignore
 } from 'custom-electron-titlebar/main';
+import { execFile } from 'child_process';
+import path from 'path';
 
 import './menu';
 import SocketHandler from './socket';
@@ -34,6 +36,8 @@ if (require('electron-squirrel-startup')) {
 let socket: SocketHandler;
 let mainWindow: BrowserWindow;
 
+console.log(path.join(__dirname, '../renderer/main_window/assets/icon.png'));
+
 const createWindow = (): void => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -41,9 +45,11 @@ const createWindow = (): void => {
     width: 1440,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      webSecurity: false,
     },
     titleBarStyle: 'hidden',
     darkTheme: true,
+    icon: path.join(__dirname, '../renderer/main_window/assets/icon.png'),
   });
 
   // and load the index.html of the app.
@@ -54,6 +60,8 @@ const createWindow = (): void => {
 
   attachTitlebarToWindow(mainWindow);
 };
+
+// const serverProc = execFile(path.join(__dirname, '../../../Service/dist/server.exe'))
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

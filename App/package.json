@@ -22,12 +22,16 @@
   "license": "MIT",
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "name": "BTread",
+        "executableName": "BTread-UI",
+        "icon": "src/assets/icon.png"
+      },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "BTread"
+            "icon": "src/assets/icon.png"
           }
         },
         {
@@ -83,6 +87,7 @@
     "@typescript-eslint/parser": "^5.0.0",
     "@vercel/webpack-asset-relocator-loader": "1.7.0",
     "autoprefixer": "^10.4.7",
+    "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.1",
     "electron": "19.0.8",
     "eslint": "^8.0.1",
@@ -99,6 +104,7 @@
     "pretty-quick": "^3.1.3",
     "sass": "^1.53.0",
     "sass-loader": "^13.0.2",
+    "shx": "^0.3.4",
     "style-loader": "^3.3.1",
     "tailwindcss": "^3.1.6",
     "ts-loader": "^9.2.2",
