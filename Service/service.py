@@ -9,6 +9,7 @@ from pywinauto import Application
 import subprocess
 import sys
 from threading import Thread, Event
+import time
 import win32.lib.win32con as win32con
 from win32 import win32gui
 
@@ -82,7 +83,7 @@ async def app_kill_watcher_init(this_app):
 async def app_kill_watcher():
     global app, app_kill_flag
     while not app_kill_flag.is_set():
-        await asyncio.sleep(1)
+        await asyncio.sleep(3)
     print("Start shutting down")
     await app.shutdown()
     print("Start cleaning up")
@@ -99,6 +100,7 @@ def ui_app_watcher():
             if return_code is not None:
                 ui_subprocess = None
                 ui_app = None
+        time.sleep(3)
     if ui_subprocess is not None:
         ui_subprocess.kill()
 

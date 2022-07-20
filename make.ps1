@@ -9,8 +9,15 @@ mkdir $distFolder;
 cd App;
 yarn install;
 yarn make;
+
 cd ..\Service;
+
+if (-not (Test-Path -Path '.\venv')) {
+    python -m virtualenv venv;
+}
+
 .\venv\Scripts\activate;
+pip install -r requirements.txt;
 .\build_exe.ps1;
 deactivate;
 cd ..;
