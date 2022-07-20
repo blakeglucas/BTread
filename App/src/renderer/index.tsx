@@ -27,6 +27,7 @@
  */
 
 import './socket';
+import './listeners';
 import App from './App';
 import { store } from './store';
 
@@ -35,7 +36,9 @@ import { Provider } from 'react-redux';
 import { createRoot } from 'react-dom/client';
 import { ipcRenderer as ipcRendererType } from 'electron/renderer';
 
-import 'antd/dist/antd.css';
+import './tailwind-preflight.css';
+import './antd.less';
+import './styles.scss';
 
 const root = createRoot(document.getElementById('root'));
 

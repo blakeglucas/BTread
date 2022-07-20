@@ -1,4 +1,6 @@
 from dotenv import load_dotenv
+
+from db.tables.Datum import DatumTableSchema
 load_dotenv()
 
 from aiohttp import web
@@ -17,6 +19,7 @@ sio = socketio.AsyncServer()
 app = web.Application()
 sio.attach(app)
 
+_scanned_devices = []
 _device: BTreadDevice | NoneType = None
 
 adv_filter = BluetoothLEAdvertisementFilter()
@@ -39,12 +42,14 @@ def _on_btread_machine_status_change(data: FTMSMachineStatusEvent):
     if data.event == FTMSMachineStatusEventOptions.START_RESUME and _active_session_id == -1:
         new_session = dbmanager.start_session()
         _active_session_id = new_session.SessionID
+        asyncio.create_task(sio.emit('training:start'))
     if data.event == FTMSMachineStatusEventOptions.PAUSE_STOP:
         if _active_session_id == -1:
             print('No active session')
         else:
             dbmanager.finish_session(_active_session_id)
             _active_session_id = -1
+            asyncio.create_task(sio.emit('training:end'))
 
 def _on_btread_training_status_change(new_data: FTMSTrainingStatus, old_data: FTMSTrainingStatus):
     print(new_data)
@@ -53,15 +58,38 @@ def _on_btread_treadmill_data(new_data: FTMSTreadmillData, old_data: FTMSTreadmi
     global _active_session_id
     if _active_session_id > 0:
         d = dbmanager.new_datum(new_data.instantaneous_speed, new_data.elapsed_time, new_data.total_energy, new_data.total_distance, _active_session_id)
+        asyncio.create_task(sio.emit('training:datum', DatumTableSchema().dump(d)))
     # print(new_data)
 
 @sio.event
 async def connect(sid: str, env: dict):
-    await sio.emit('api:status', 'hello', sid)
+    print(f'Client connected, sid: {sid}')
+
+@sio.event
+async def disconnect(sid: str):
+    print(f'Client disconnected, sid: {sid}')
+
+@sio.on('state_sync')
+async def sync_state(sid: str):
+    global _device, _is_scanning, _scanned_devices, _active_session_id
+    state_obj = {
+        'devices': {
+                'device': {
+                'address': _device.mac_address,
+            } if _device else None,
+            'isScanning': _is_scanning,
+            'scannedDevices': _scanned_devices,
+        },
+        'training': {
+            'status': 'idle' if _active_session_id == -1 else 'running',
+            'data': [] if _active_session_id == -1 else dbmanager.get_session_datapoints(_active_session_id)
+        }
+    }
+    await sio.emit('state_sync', state_obj, sid)
 
 @sio.on('ble:scan')
 async def scan_devices(sid: str, args):
-    global _is_scanning
+    global _is_scanning, _scanned_devices
     if _is_scanning:
         return
     _is_scanning = True
@@ -82,9 +110,10 @@ async def scan_devices(sid: str, args):
     await scanner.stop()
     print(f'Stopped ble scan ({sid})')
     _is_scanning = False
-    await sio.emit('ble:scan', devices, sid)
+    _scanned_devices = list(devices.values()),
+    await sio.emit('ble:scan', list(devices.values()), sid)
 
-@sio.on('btread:connect')
+@sio.on('ble:connect')
 async def init_btread(sid: str, args):
     global _device
     (mac, ) = args
@@ -96,22 +125,23 @@ async def init_btread(sid: str, args):
     _device.on(BTreadDeviceEvents.TREADMILL_DATA_CHANGED, _on_btread_treadmill_data)
     result = await _device.connect()
     if result:
-        await sio.emit('btread:connect', True, sid)
+        await sio.emit('ble:connect', True, sid)
     else:
-        await sio.emit('btread:connect', False, sid)
+        await sio.emit('ble:connect', False, sid)
         await deinit_btread(sid)
 
-@sio.on('btread:disconnect')
-async def deinit_btread(sid: str):
+@sio.on('ble:disconnect')
+async def deinit_btread(sid: str, *args):
+    print(args)
     global _device
     if _device:
         result = await _device.disconnect()
         if result is None:
-            await sio.emit('btread:disconnect', 'Device not connected', sid)
+            await sio.emit('ble:disconnect', 'Device not connected', sid)
         elif result is False:
-            await sio.emit('btread:disconnect', 'Failed to disconnect?', sid)
+            await sio.emit('ble:disconnect', 'Failed to disconnect?', sid)
         elif result:
-            await sio.emit('btread:disconnect', 'Disconnected successfully', sid)
+            await sio.emit('ble:disconnect', 'Disconnected successfully', sid)
         _device = None
 
 

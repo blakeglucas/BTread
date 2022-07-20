@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.cet-container {
+  @apply bg-neutral-700;
+}
+
+.ant-layout-sider-children {
+  width: 100%;
+}

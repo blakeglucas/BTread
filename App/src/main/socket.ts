@@ -8,6 +8,7 @@ export default class SocketHandler {
 
     this.socket.on('connect', () => {
       console.log('connected');
+      this.send('state_sync');
     });
 
     this.socket.on('disconnect', () => {
@@ -16,7 +17,6 @@ export default class SocketHandler {
 
     // @ts-ignore
     this.socket.onAny((eventName, ...args) => {
-      console.log(eventName, args);
       this.win.webContents.send('socket', eventName, args);
     });
   }

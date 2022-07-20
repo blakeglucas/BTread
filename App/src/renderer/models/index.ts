@@ -1,8 +1,13 @@
 import { Models } from '@rematch/core';
-import statusModel from './status';
+import DevicesModel from './devices';
+import TrainingModel from './training';
 
 export interface RootModel extends Models<RootModel> {
-  status: typeof statusModel;
+  devices: typeof DevicesModel;
+  training: typeof TrainingModel;
 }
 
-export const models: RootModel = { status: statusModel };
+export const models: RootModel = {
+  devices: DevicesModel,
+  training: TrainingModel,
+};

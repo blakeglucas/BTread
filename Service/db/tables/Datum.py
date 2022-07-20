@@ -2,6 +2,8 @@ from sqlalchemy import Table, Column, Float, Integer, DateTime, ForeignKey
 from sqlalchemy.orm import declarative_base
 from ..tables.Session import SessionTable
 
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+
 from .Base import Base
 
 class DatumTable(Base):
@@ -13,3 +15,9 @@ class DatumTable(Base):
     Calories = Column('Calories', Integer)
     Distance = Column('Distance', Integer)
     SessionID = Column('SessionID', Integer, ForeignKey(SessionTable.SessionID), nullable=False)
+
+class DatumTableSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = DatumTable
+        include_fk = True
+        load_instance = True

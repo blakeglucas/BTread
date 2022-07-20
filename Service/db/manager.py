@@ -63,3 +63,6 @@ def new_datum(speed: float, elapsed_time: int, calories: int, distance: int, ses
     session.commit()
     session.flush()
     return d
+
+def get_session_datapoints(session_id: int):
+    return session.query(DatumTable).where(DatumTable.SessionID == session_id).all()

@@ -1,0 +1,116 @@
+import React from 'react';
+import { Avatar, Button, Layout, List, Spin } from 'antd';
+import clsx from 'clsx';
+import { RootState, Dispatch } from '../store';
+import { useSelector, useDispatch } from 'react-redux';
+import { ScannedDevice } from '../models/devices';
+
+const { Header, Footer, Sider, Content } = Layout;
+
+export function MainPage() {
+  const [selectedDevice, setSelectedDevice] = React.useState<string>('');
+
+  const scannedDevices = useSelector(
+    (state: RootState) => state.devices.scannedDevices
+  );
+
+  const scanning = useSelector((state: RootState) => state.devices.scanning);
+  const connecting = useSelector(
+    (state: RootState) => state.devices.connecting
+  );
+
+  const deviceConnected = useSelector(
+    (state: RootState) => state.devices.deviceConnected
+  );
+  const device = useSelector((state: RootState) => state.devices.device);
+
+  const disconnecting = useSelector(
+    (state: RootState) => state.devices.disconnecting
+  );
+
+  const dispatch = useDispatch<Dispatch>();
+
+  async function startScan() {
+    await dispatch.devices.startScan();
+  }
+
+  async function connect(dev: ScannedDevice) {
+    setSelectedDevice(dev.address);
+    await dispatch.devices.connectToDevice(dev);
+  }
+
+  async function disconnect() {
+    await dispatch.devices.disconnect(null);
+    setSelectedDevice('');
+  }
+
+  return (
+    <Layout className="h-full">
+      <Sider
+        className="bg-neutral-600 flex flex-col items-center justify-start"
+        width={300}
+      >
+        <div className="w-full px-6 py-4 flex flex-col items-center">
+          <Button
+            type="primary"
+            size="large"
+            onClick={() => startScan()}
+            loading={scanning}
+            disabled={connecting || deviceConnected}
+          >
+            Scan for BTread Devices
+          </Button>
+          <List
+            className="my-3 max-h-64 w-full"
+            dataSource={scannedDevices?.sort((a, b) => b.rssi - a.rssi)}
+            bordered
+            renderItem={(item) => (
+              <List.Item
+                onClick={
+                  connecting || deviceConnected || scanning || disconnecting
+                    ? undefined
+                    : () => {
+                        connect(item);
+                      }
+                }
+                className={clsx(
+                  !connecting &&
+                    !scanning &&
+                    !deviceConnected &&
+                    'cursor-pointer hover:bg-neutral-500',
+                  deviceConnected &&
+                    device?.address === item.address &&
+                    'bg-green-600'
+                )}
+              >
+                <List.Item.Meta
+                  title={item.name}
+                  description={item.address}
+                  avatar={
+                    <Avatar size={32}>
+                      {connecting && selectedDevice === item.address ? (
+                        <Spin />
+                      ) : (
+                        item.rssi
+                      )}
+                    </Avatar>
+                  }
+                />
+              </List.Item>
+            )}
+          ></List>
+          <Button
+            type="primary"
+            danger
+            onClick={() => disconnect()}
+            loading={disconnecting}
+            disabled={!deviceConnected}
+          >
+            Disconnect
+          </Button>
+        </div>
+      </Sider>
+      <Content className="bg-neutral-800">Content</Content>
+    </Layout>
+  );
+}
