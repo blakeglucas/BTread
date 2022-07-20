@@ -1,4 +1,3 @@
-from tkinter import SEPARATOR
 from aiohttp import web
 import asyncio
 import config
