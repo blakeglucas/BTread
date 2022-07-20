@@ -72,6 +72,7 @@ async def disconnect(sid: str):
 @sio.on('state_sync')
 async def sync_state(sid: str):
     global _device, _is_scanning, _scanned_devices, _active_session_id
+    training_data_cur_session = dbmanager.get_session_datapoints(_active_session_id)
     state_obj = {
         'devices': {
                 'device': {
@@ -82,7 +83,7 @@ async def sync_state(sid: str):
         },
         'training': {
             'status': 'idle' if _active_session_id == -1 else 'running',
-            'data': [] if _active_session_id == -1 else dbmanager.get_session_datapoints(_active_session_id)
+            'data': [] if _active_session_id == -1 else DatumTableSchema().dump(training_data_cur_session, many=True)
         }
     }
     await sio.emit('state_sync', state_obj, sid)
@@ -144,6 +145,24 @@ async def deinit_btread(sid: str, *args):
             await sio.emit('ble:disconnect', 'Disconnected successfully', sid)
         _device = None
 
+@sio.on('training:start')
+async def training_start(sid: str, *args):
+    global _device
+    # try:
+    await _device.start()
+    await sio.emit('training:start', True, sid)
+    # except Exception as e:
+    #     print(1, e)
+    #     await sio.emit('training:start', False, sid)
+
+@sio.on('training:end')
+async def training_end(sid: str, *args):
+    global _device
+    # try:
+    await _device.stop()
+    await sio.emit('training:end', True, sid)
+    # except:
+        # await sio.emit('training:end', False, sid)
 
 async def main():
     await init_btread(-1, ('5A:B8:5E:20:B4:71',))

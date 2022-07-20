@@ -1,4 +1,5 @@
 import React from 'react';
+import { HashRouter } from 'react-router-dom';
 import { MainPage } from './pages/MainPage';
 
 export default function () {
@@ -6,5 +7,9 @@ export default function () {
     electron.ipcRenderer.send('ui:ready');
   }, []);
 
-  return <MainPage />;
+  return (
+    <HashRouter>
+      <MainPage />
+    </HashRouter>
+  );
 }

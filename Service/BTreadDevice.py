@@ -173,13 +173,13 @@ class BTreadDevice(EventEmitter):
         # await self.__client.write_gatt_char(return_c, b'\x1d')
 
     async def start(self):
-        await self.__send_cmd(self.__ftms_control_point_c, bytearray((FTMSControlPointCommand.START.value,)))
+        await self.__send_cmd(self.__ftms_control_point_c, bytearray((FTMSControlPointCommand.START_RESUME.value,)))
 
     async def stop(self):
-        await self.__send_cmd(self.__ftms_control_point_c, bytearray((FTMSControlPointCommand.STOP.value, 0x01)))
+        await self.__send_cmd(self.__ftms_control_point_c, bytearray((FTMSControlPointCommand.STOP_PAUSE.value, 0x01)))
 
     async def pause(self):
-        await self.__send_cmd(self.__ftms_control_point_c, bytearray((FTMSControlPointCommand.STOP.value, 0x02)))
+        await self.__send_cmd(self.__ftms_control_point_c, bytearray((FTMSControlPointCommand.STOP_PAUSE.value, 0x02)))
 
     async def set_speed(self, speed: float):
         new_target_speed = int(math.floor(speed * 100))

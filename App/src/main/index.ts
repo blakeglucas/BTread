@@ -1,8 +1,8 @@
 import { app, BrowserWindow, ipcMain, session } from 'electron';
-// @ts-ignore
 import {
   setupTitlebar,
   attachTitlebarToWindow,
+  // @ts-ignore
 } from 'custom-electron-titlebar/main';
 
 import './menu';
@@ -38,7 +38,7 @@ const createWindow = (): void => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     height: 600,
-    width: 800,
+    width: 1440,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
@@ -50,7 +50,7 @@ const createWindow = (): void => {
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 
   attachTitlebarToWindow(mainWindow);
 };

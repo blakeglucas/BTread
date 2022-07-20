@@ -1,11 +1,25 @@
 import React from 'react';
-import { Avatar, Button, Layout, List, Spin } from 'antd';
+import { Avatar, Button, Layout, List, Menu, Spin } from 'antd';
 import clsx from 'clsx';
 import { RootState, Dispatch } from '../store';
 import { useSelector, useDispatch } from 'react-redux';
 import { ScannedDevice } from '../models/devices';
+import { Link, NavLink, Routes, Route } from 'react-router-dom';
+import { CurrentTrainingPage } from './CurrentTrainingPage';
+import { ReportingPage } from './ReportingPage';
 
 const { Header, Footer, Sider, Content } = Layout;
+
+const links = [
+  {
+    label: 'Current Training',
+    href: '/',
+  },
+  {
+    label: 'Historical Data',
+    href: 'reporting',
+  },
+];
 
 export function MainPage() {
   const [selectedDevice, setSelectedDevice] = React.useState<string>('');
@@ -109,8 +123,31 @@ export function MainPage() {
             Disconnect
           </Button>
         </div>
+        <div className="flex flex-row items-center p-4 w-full">
+          <hr className="w-full text-neutral-400" />
+        </div>
+        <div className="w-full mt-4">
+          {links.map((link, index) => (
+            <NavLink
+              key={index}
+              to={link.href}
+              className={({ isActive }) =>
+                isActive
+                  ? 'bg-neutral-800 w-full p-3 text-white flex hover:text-white cursor-default'
+                  : 'bg-neutral-700 w-full p-3 text-white hover:text-white hover:bg-neutral-500 cursor-pointer flex'
+              }
+            >
+              <span>{link.label}</span>
+            </NavLink>
+          ))}
+        </div>
       </Sider>
-      <Content className="bg-neutral-800">Content</Content>
+      <Content className="bg-neutral-800">
+        <Routes>
+          <Route index element={<CurrentTrainingPage />} />
+          <Route path="reporting" element={<ReportingPage />} />
+        </Routes>
+      </Content>
     </Layout>
   );
 }

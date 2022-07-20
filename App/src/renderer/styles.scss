@@ -9,3 +9,10 @@
 .ant-layout-sider-children {
   width: 100%;
 }
+
+.training-control-button {
+  @apply w-16 h-16 !important;
+  & > * {
+    font-size: 32px !important;
+  }
+}

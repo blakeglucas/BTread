@@ -44,11 +44,25 @@ export default createModel<RootModel>()({
       };
     },
     addDatum(state, payload: TrainingDatum) {
+      const baseData =
+        /*state.data.length >= 100 ? state.data.slice(-99) : */ state.data;
       return {
         ...state,
-        data: [...state.data, payload],
+        data: [...baseData, payload],
       };
     },
   },
-  effects: {},
+  effects: {
+    async toggle(payload: null, state) {
+      const eventName =
+        state.training.status === 'idle' ? 'training:start' : 'training:end';
+      sendMessage(eventName);
+      const result = await new Promise((resolve) => {
+        events.once(eventName, (result: [boolean]) => {
+          resolve(result[0]);
+        });
+      });
+      console.log(result);
+    },
+  },
 });
