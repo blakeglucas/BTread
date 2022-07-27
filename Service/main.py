@@ -55,11 +55,11 @@ def _on_btread_training_status_change(new_data: FTMSTrainingStatus, old_data: FT
     print(new_data)
 
 def _on_btread_treadmill_data(new_data: FTMSTreadmillData, old_data: FTMSTreadmillData):
-    # global _active_session_id
-    # if _active_session_id > 0:
-    #     d = dbmanager.new_datum(new_data.instantaneous_speed, new_data.elapsed_time, new_data.total_energy, new_data.total_distance, _active_session_id)
-    #     asyncio.create_task(sio.emit('training:datum', DatumTableSchema().dump(d)))
-    print(new_data)
+    global _active_session_id
+    if _active_session_id > 0:
+        d = dbmanager.new_datum(new_data.instantaneous_speed, new_data.elapsed_time, new_data.total_energy, new_data.total_distance, _active_session_id)
+        asyncio.create_task(sio.emit('training:datum', DatumTableSchema().dump(d)))
+    # print(new_data)
 
 @sio.event
 async def connect(sid: str, env: dict):
