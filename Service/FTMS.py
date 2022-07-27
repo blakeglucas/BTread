@@ -73,8 +73,8 @@ class FTMSTreadmillData:
     def __init__(self, val):
         self.instantaneous_speed = int.from_bytes(val[2:4], 'little') / 100.0
         self.total_distance = int.from_bytes(val[4:6], 'little')
-        self.total_energy = int.from_bytes(val[6:8], 'big')
-        self.elapsed_time = int.from_bytes(filter(lambda x: x != 0, val[8:]), 'little')
+        self.total_energy = int.from_bytes(val[6:10], 'big')
+        self.elapsed_time = int.from_bytes(filter(lambda x: x != 0, val[10:]), 'little')
 
     def __repr__(self):
         return f'FTMSTreadmillData({self.instantaneous_speed}, {self.total_distance}, {self.total_energy}, {self.elapsed_time}'
