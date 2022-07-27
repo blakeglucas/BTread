@@ -171,16 +171,13 @@ async def get_sessions_in_range(sid: str, dates_arr: tuple[str, str], *args):
     await sio.emit('data:range', SessionTableSchema().dump(results, many=True))
 
 async def main():
-    results = dbmanager.get_sessions_within(datetime(2022, 7, 25, tzinfo=pytz.UTC), datetime(2022, 7, 28, tzinfo=pytz.UTC))
-    print(results[0].Data[0].Timestamp)
-    print(SessionTableSchema().dump(results, many=True))
-    # await init_btread(-1, ('5A:B8:5E:20:B4:71',))
-    # while True:
-    #     try:
-    #         await asyncio.sleep(1)
-    #     except KeyboardInterrupt:
-    #         break
-    # await deinit_btread(-1)
+    await init_btread(-1, ('5A:B8:5E:20:B4:71',))
+    while True:
+        try:
+            await asyncio.sleep(1)
+        except KeyboardInterrupt:
+            break
+    await deinit_btread(-1)
 
 if __name__ == '__main__':
     try:
