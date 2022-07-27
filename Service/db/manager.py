@@ -4,9 +4,8 @@ from datetime import datetime
 import os
 from sqlalchemy import create_engine, event, insert
 from sqlalchemy.engine.base import Connection, Engine
-from sqlalchemy.orm import Session, declarative_base
-from .tables.Datum import DatumTable
-from .tables.Session import SessionTable
+from sqlalchemy.orm import Session, contains_eager
+
 from .tables.Base import Base
 
 engine = create_engine(f'sqlite:///{os.path.abspath(DB_FILE)}', future=True)
@@ -23,6 +22,9 @@ session = Session(engine)
 atexit.register(session.close)
 
 Base.metadata.create_all(engine)
+
+from .tables.Datum import DatumTable
+from .tables.Session import SessionTable
 
 def start_session():
     s = SessionTable(StartTime=datetime.utcnow())
@@ -49,7 +51,6 @@ def finish_session(session_id: int):
         print(f'No existing session with ID "{session_id}')
         return None
 
-
 def new_datum(speed: float, elapsed_time: int, calories: int, distance: int, session_id: int):
     d = DatumTable(
         Timestamp=datetime.utcnow(),
@@ -66,3 +67,6 @@ def new_datum(speed: float, elapsed_time: int, calories: int, distance: int, ses
 
 def get_session_datapoints(session_id: int):
     return session.query(DatumTable).where(DatumTable.SessionID == session_id).all()
+
+def get_sessions_within(start: datetime, end: datetime):
+    return session.query(SessionTable).filter(SessionTable.StartTime >= start, SessionTable.EndTime <= end).all()

@@ -4,6 +4,7 @@ import { Line, LineConfig } from '@ant-design/plots';
 import { RootState, Dispatch } from '../store';
 import { useSelector, useDispatch } from 'react-redux';
 import { PlayCircleOutlined, PauseCircleOutlined } from '@ant-design/icons';
+import { formatSecs } from '../utils/formatSecs';
 
 const { Sider, Content } = Layout;
 
@@ -35,7 +36,7 @@ export function CurrentTrainingPage() {
 
   const lastDatum = React.useMemo(() => data[data.length - 1], [data]);
 
-  //   function formatTime(secs: number) {
+  //   function formatSecs(secs: number) {
   //     const parts: number[] = []
   //     while (secs >= 1) {
   //         const x = secs % 60;
@@ -45,16 +46,8 @@ export function CurrentTrainingPage() {
   //     return parts.reverse().map((x, i) => x.toString().padStart(i === 0 ? 1 : 2, '0')).join(':')
   //   }
 
-  function formatTime(secs: number) {
-    let base = new Date(secs * 1000).toISOString().substring(11, 19);
-    base = base.replace(/^(00:)+/g, '');
-    base = base.indexOf(':') === -1 ? '0:' + base : base;
-    return base[0] === '0' && base[1] !== ':' ? base.substring(1) : base;
-  }
-
   async function onTrainingButton() {
     const result = await dispatch.training.toggle(null);
-    console.log(result);
   }
 
   return (
@@ -89,7 +82,7 @@ export function CurrentTrainingPage() {
           <div>
             <span>Elapsed Time</span>
             <p className="text-5xl">
-              {lastDatum ? formatTime(lastDatum.ElapsedTime) : '0:00'}
+              {lastDatum ? formatSecs(lastDatum.ElapsedTime) : '0:00'}
             </p>
           </div>
           <div>

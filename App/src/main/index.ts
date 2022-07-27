@@ -36,8 +36,6 @@ if (require('electron-squirrel-startup')) {
 let socket: SocketHandler;
 let mainWindow: BrowserWindow;
 
-console.log(path.join(__dirname, '../renderer/main_window/assets/icon.png'));
-
 const createWindow = (): void => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -56,7 +54,9 @@ const createWindow = (): void => {
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
+  if (process.env.NODE_ENV === 'development') {
+    mainWindow.webContents.openDevTools();
+  }
 
   attachTitlebarToWindow(mainWindow);
 };
@@ -93,6 +93,5 @@ ipcMain.on('ui:ready', () => {
 });
 
 ipcMain.on('socket', (event, eventName, ...args) => {
-  console.log('index.socket', eventName, args);
   socket.send(eventName, args);
 });

@@ -1,6 +1,6 @@
 from sqlalchemy import Table, Column, Float, Integer, DateTime, ForeignKey
-from sqlalchemy.orm import declarative_base
-from ..tables.Session import SessionTable
+from sqlalchemy.orm import relationship
+# from ..tables.Session import SessionTable
 
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 
@@ -14,7 +14,7 @@ class DatumTable(Base):
     ElapsedTime = Column('ElapsedTime', Integer)
     Calories = Column('Calories', Integer)
     Distance = Column('Distance', Integer)
-    SessionID = Column('SessionID', Integer, ForeignKey(SessionTable.SessionID), nullable=False)
+    SessionID = Column('SessionID', Integer, ForeignKey('Session.SessionID'), nullable=False)
 
 class DatumTableSchema(SQLAlchemyAutoSchema):
     class Meta:

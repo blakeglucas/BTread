@@ -11,8 +11,6 @@ contextBridge.exposeInMainWorld('electron', {
   },
 });
 
-console.log(path.join(__dirname, 'assets/icon.png'));
-
 window.addEventListener('DOMContentLoaded', () => {
   // Title bar implemenation
   new Titlebar({

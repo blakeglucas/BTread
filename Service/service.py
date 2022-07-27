@@ -1,4 +1,5 @@
 from aiohttp import web
+import argparse
 import asyncio
 import config
 from main import app
@@ -109,10 +110,25 @@ def open_ui_app():
     ui_app = Application().connect(process=ui_subprocess.pid)
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--no-ui-thread', '-u', action='store_true', required=False, help='Pass this flag to disable UI thread')
+    parser.add_argument('--no-systray', '-s', action='store_true', required=False, help='Pass this flag to disable systray thread')
+    args = parser.parse_args()
     app.on_startup.append(app_kill_watcher_init)
     app_thread = Thread(target=start_server)
     app_thread.start()
-    open_ui_app()
-    ui_app_thread = Thread(target=ui_app_watcher)
-    ui_app_thread.start()
-    show_systray()
+    if not args.no_ui_thread:
+        open_ui_app()
+        ui_app_thread = Thread(target=ui_app_watcher)
+        ui_app_thread.start()
+    if args.no_systray:
+        # Keep alive without systray blocking
+        while True:
+            try:
+                time.sleep(1)
+            except KeyboardInterrupt:
+                break
+        app_kill_flag.set()
+        app_thread.join()
+    else:
+        show_systray()

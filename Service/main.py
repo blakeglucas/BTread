@@ -1,15 +1,19 @@
+from datetime import datetime
 from aiohttp import web
 import asyncio
 from bleak import BleakScanner
 from bleak.backends.device import BLEDevice
 from bleak.backends.scanner import AdvertisementData
 from BTreadDevice import BTreadDevice, BTreadDeviceEvents
+import dateutil.parser
 from db import manager as dbmanager
 from db.tables.Datum import DatumTableSchema
+from db.tables.Session import SessionTableSchema
 from FTMS import FTMSMachineStatusEvent, FTMSMachineStatusEventOptions, FTMSTrainingStatus, FTMSTreadmillData
 import socketio
 from types import NoneType
 from bleak_winrt.windows.devices.bluetooth.advertisement import BluetoothLEAdvertisementFilter, BluetoothLEAdvertisement
+import pytz
 
 sio = socketio.AsyncServer()
 app = web.Application()
@@ -159,14 +163,24 @@ async def training_end(sid: str, *args):
     # except:
         # await sio.emit('training:end', False, sid)
 
+@sio.on('data:range')
+async def get_sessions_in_range(sid: str, dates_arr: tuple[str, str], *args):
+    (start, end) = dates_arr
+    dateutil.parser.parse(start)
+    results = dbmanager.get_sessions_within(dateutil.parser.parse(start), dateutil.parser.parse(end))
+    await sio.emit('data:range', SessionTableSchema().dump(results, many=True))
+
 async def main():
-    await init_btread(-1, ('5A:B8:5E:20:B4:71',))
-    while True:
-        try:
-            await asyncio.sleep(1)
-        except KeyboardInterrupt:
-            break
-    await deinit_btread(-1)
+    results = dbmanager.get_sessions_within(datetime(2022, 7, 25, tzinfo=pytz.UTC), datetime(2022, 7, 28, tzinfo=pytz.UTC))
+    print(results[0].Data[0].Timestamp)
+    print(SessionTableSchema().dump(results, many=True))
+    # await init_btread(-1, ('5A:B8:5E:20:B4:71',))
+    # while True:
+    #     try:
+    #         await asyncio.sleep(1)
+    #     except KeyboardInterrupt:
+    #         break
+    # await deinit_btread(-1)
 
 if __name__ == '__main__':
     try:

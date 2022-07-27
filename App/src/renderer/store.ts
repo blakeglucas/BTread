@@ -26,7 +26,6 @@ export type ExpectedStateObj = {
 };
 
 events.on('state_sync', (obj: [ExpectedStateObj]) => {
-  console.log(obj);
   store.dispatch.devices.stateSync(obj[0].devices);
   store.dispatch.training.stateSync(obj[0].training);
 });

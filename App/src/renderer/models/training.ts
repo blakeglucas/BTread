@@ -45,7 +45,7 @@ export default createModel<RootModel>()({
     },
     addDatum(state, payload: TrainingDatum) {
       const baseData =
-        /*state.data.length >= 100 ? state.data.slice(-99) : */ state.data;
+        state.data.length >= 100 ? state.data.slice(-99) : state.data;
       return {
         ...state,
         data: [...baseData, payload],
@@ -62,7 +62,6 @@ export default createModel<RootModel>()({
           resolve(result[0]);
         });
       });
-      console.log(result);
     },
   },
 });
